@@ -1,5 +1,5 @@
-
-
+import datetime
+import time
 class DLinkedNode(): 
 	"""
 	Node class for doubly linked list
@@ -64,7 +64,7 @@ class CABdata():
         """
         Remove node from the busy part of linkedlist and add right after head.
         """
-        cabhistory.append("IDLE")
+        cabhistory.append(("IDLE",int(time.time())))
         node.value.state = "IDLE"
         self._remove_node(node)
         self._add_node_idle(node)
@@ -123,7 +123,6 @@ class Cab():
 		self.cab_id = cab_id
 		self.state = cab_state
 		self.city_id = city_id
-		self.cab_busy_time = []
 
 
 
@@ -162,6 +161,7 @@ class CabBookingTool():
 		self.city_cabs = {}
 		self.admin = CabBookingAdmin()
 		self.cabhistory = {}
+		self.citystats = {}
 
 	def addcities(self,city_id,city_name):
 		"""
@@ -178,13 +178,14 @@ class CabBookingTool():
 		addedcab = self.admin.register_cab(cab_id,cab_state,city_id,[])
 		self.cabhistory[cab_id] = []
 		self.city_cabs[city_id].put_data(cab_id,addedcab,cab_state)
-		self.cabhistory[cab_id].append(cab_state)
+		self.cabhistory[cab_id].append((cab_state,int(time.time())))
 
 	def bookcab(self, start_city, end_city):
 		"""
 		Method to book cab by customer and return the cabtrip object
 
 		"""
+		self.city_stats(start_city)
 		city_cabs_object_start = self.city_cabs[self.city_dict[start_city].city_id]
 		city_cabs_object_end = self.city_cabs[self.city_dict[end_city].city_id]
 
@@ -195,7 +196,7 @@ class CabBookingTool():
 		else:
 			addedcabtrip = self.admin.register_cab(res.cab_id,"ON_TRIP",self.city_dict[end_city])
 			city_cabs_object_end.put_data(res.cab_id, addedcab,"ON_TRIP")	
-			self.cabhistory.append("ON_TRIP")
+			self.cabhistory.append(("ON_TRIP",int(time.time())))
 			return addedcabtrip
 
 	def endtrip(self, cabtrip, end_city):
@@ -209,17 +210,38 @@ class CabBookingTool():
 		return "Success"
 
 
+	def city_stats(self, start_city):
+		"""
+		Method to generate the peak time stats of various cities
+		"""
+		if start_city in self.citystats:
+			self.citystats["total_count"]+=1
+			now = datetime.datetime.now()
+			hr = now.hour
+			if hr in self.citystats["hourly_count"]:
+				self.citystats["hourly_count"][hr]+=1
+
+		else:
+			self.citystats["total_count"] = 1
+			now = datetime.datetime.now()
+			hr = now.hour
+			self.citystats["hourly_count"][hr] = 1
+
+
+	def city_peak_info(self):
+		peakcity = max(self.citystats.items(), key = lambda i:i[1]['total_count'])
+		"""
+		The city with highest demand and the peak time in that city
+		"""
+
+		print("City with Highest Demand"+peakcity[0])
+		peakhourofcity = max(self.citystats[peakcity[0]]["hourly_count"].items, key = lambda i:i[1])
+		print("Peak Hour of City with highest demand"+peakhourofcity[0])
+		return peakcity[0], peakhourofcity[0]
+
 	def cabhistory(self,cab_id):
 		"""
 		Return the cab history of a particular cab
 		"""
 		return self.cabhistory[cab_id]
-
-
-	
-
-
-
-#unknown_city
-#unknown_city_id
 
