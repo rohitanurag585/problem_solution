@@ -4,111 +4,111 @@ class DLinkedNode():
 	"""
 	Node class for doubly linked list
 	"""
-    def __init__(self):
-        self.key = 0
-        self.value = 0
-        self.prev = None
-        self.next = None
+	def __init__(self):
+		self.key = 0
+		self.value = 0
+		self.prev = None
+		self.next = None
             
 class CABdata():
-    def __init__(self):
-    	"""
+	def __init__(self):
+		"""
 		A data structure which contains hashmap to keep track of keys and values in the doubly linkedlist with head, middle and tail pointer
-    	"""
-        self.data_dict = {}
-        self.size = 0
-        self.head, self.middle, self.tail = DLinkedNode(), DLinkedNode(), DLinkedNode()
+		"""
+		self.data_dict = {}
+		self.size = 0
+		self.head, self.middle, self.tail = DLinkedNode(), DLinkedNode(), DLinkedNode()
 
 
-        self.head.next = self.middle
-        self.middle.prev = self.head
+		self.head.next = self.middle
+		self.middle.prev = self.head
 
-        self.middle.next = self.tail
-        self.tail.prev = self.middle
-
-
-    def _add_node_idle(self, node):
-        """
-        Always add idle node right after head.
-        """
-        node.prev = self.head
-        node.next = self.head.next
-
-        self.head.next.prev = node
-        self.head.next = node
-
-    def _add_node_busy(self, node):
-        """
-        Always add busy node right after middle.
-        """
-        node.prev = self.middle
-        node.next = self.middle.next
-
-        self.middle.next.prev = node
-        self.middle.next = node
+		self.middle.next = self.tail
+		self.tail.prev = self.middle
 
 
-    def _remove_node(self, node):
-        """
-        Remove an existing node from the linked list.
-        """
-        prev = node.prev
-        new = node.next
+	def _add_node_idle(self, node):
+		"""
+		Always add idle node right after head.
+		"""
+		node.prev = self.head
+		node.next = self.head.next
 
-        prev.next = new
-        new.prev = prev
+		self.head.next.prev = node
+		self.head.next = node
+
+	def _add_node_busy(self, node):
+		"""
+		Always add busy node right after middle.
+		"""
+		node.prev = self.middle
+		node.next = self.middle.next
+
+		self.middle.next.prev = node
+		self.middle.next = node
+
+
+	def _remove_node(self, node):
+		"""
+		Remove an existing node from the linked list.
+		"""
+		prev = node.prev
+		new = node.next
+
+		prev.next = new
+		new.prev = prev
 
 
 
-    def _move_busy_to_idle(self, node, cabhistory):
-        """
-        Remove node from the busy part of linkedlist and add right after head.
-        """
-        cabhistory.append(("IDLE",int(time.time())))
-        node.value.state = "IDLE"
-        self._remove_node(node)
-        self._add_node_idle(node)
+	def _move_busy_to_idle(self, node, cabhistory):
+		"""
+		Remove node from the busy part of linkedlist and add right after head.
+		"""
+		cabhistory.append(("IDLE",int(time.time())))
+		node.value.state = "IDLE"
+		self._remove_node(node)
+		self._add_node_idle(node)
 
-    def _pop_idle_node(self):
-        """
-        Pop the idle node just left to middle as it is most idle node and use it for cab.
-        """
-        res = self.middle.prev
-        if res == head:
-        	return -1
-        self._remove_node(res)
-        return res.value
+	def _pop_idle_node(self):
+		"""
+		Pop the idle node just left to middle as it is most idle node and use it for cab.
+		"""
+		res = self.middle.prev
+		if res == head:
+			return -1
+		self._remove_node(res)
+		return res.value
 
-        
 
-    def _pop_busy_node(self, key, cabhistory):
-        """
+
+	def _pop_busy_node(self, key, cabhistory):
+		"""
 		Pop and move node from busy to idle section of linkedlist
-        """
-        node = self.data_dict.get(key, None)
-        if not node:
-            return -1
+		"""
+		node = self.data_dict.get(key, None)
+		if not node:
+			return -1
 
-        self._move_busy_to_idle(node, cabhistory)
+		self._move_busy_to_idle(node, cabhistory)
 
-        return node.value
+		return node.value
 
-    def put_data(self, key, value, states):
-        """
+	def put_data(self, key, value, states):
+		"""
 		Insert data into the linked list
-        """
-        newNode = DLinkedNode()
-        newNode.key = key
-        newNode.value = value
+		"""
+		newNode = DLinkedNode()
+		newNode.key = key
+		newNode.value = value
 
-        self.data_dict[key] = newNode
-        if states = "IDLE":
-        	self._add_node_idle(newNode)
-        else:
-        	self._add_node_busy(newNode)
+		self.data_dict[key] = newNode
+		if states == "IDLE":
+			self._add_node_idle(newNode)
+		else:
+			self._add_node_busy(newNode)
 
 
-        self.size += 1
+		self.size += 1
 
 
 
