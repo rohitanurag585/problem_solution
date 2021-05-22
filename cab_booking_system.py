@@ -245,3 +245,15 @@ class CabBookingTool():
 		"""
 		return self.cabhistory[cab_id]
 
+
+
+"""
+
+CabBookingTool will be instatiated here and called as:
+
+obj = CabBookingTool()
+obj.addcities("city_id","city_name")
+obj.addcabs("cab_id","cab_state","city_id")
+
+"""
+
